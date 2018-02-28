@@ -4,19 +4,23 @@ const config = require('../config/config')
 
 function jwtSignUser (user) {
   const ONE_WEEK = 60 * 60 * 24 * 7
-  return jwt.sign(user, 'superSecret',{
+  return jwt.sign(user, config.authentication.jwtSecret, {
     expiresIn: ONE_WEEK
   })
 }
+
 module.exports = {
   async register (req, res) {
     try {
       const user = await User.create(req.body)
-      res.send(user.toJSON())
+      const userJson = user.toJSON()
+      res.send({
+        user: userJson,
+        token: jwtSignUser(userJson)
+      })
     } catch (err) {
-      console.log("no ")
-      res.status(400).send({
-        error: 'This Email account is already in use'
+        res.status(400).send({
+          error: 'This email account is already in use.'
       })
     }
   },
@@ -28,27 +32,28 @@ module.exports = {
           email: email
         }
       })
+
       if (!user) {
         return res.status(403).send({
-          error: 'cannot find this user'
+          error: 'The login information was incorrect'
         })
       }
-      //here be aware why add await, it returns a promise
+
       const isPasswordValid = await user.comparePassword(password)
       if (!isPasswordValid) {
         return res.status(403).send({
-          error: 'password incorrect'
+          error: 'The login information was incorrect'
         })
       }
+
       const userJson = user.toJSON()
       res.send({
         user: userJson,
-        //jwtSignUser  gives me error!...no clue
         token: jwtSignUser(userJson)
       })
     } catch (err) {
-      res.status(500).send({
-        error: err
+        res.status(500).send({
+          error: 'An error has occured trying to log in'
       })
     }
   }

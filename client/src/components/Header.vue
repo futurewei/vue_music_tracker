@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar fixed class="cyan">
+  <v-toolbar fixed class="light-blue">
     <v-toolbar-title class="mr-4">
         <span class="home"
         @click="navigateTo({name: 'root'})">
@@ -7,7 +7,7 @@
       </span>
     </v-toolbar-title>
     <v-toolbar-items>
-        <v-btn flat dark>
+        <v-btn flat dark @click="navigateTo({name: 'songs'})">
             Browse
         </v-btn>
     </v-toolbar-items>
@@ -42,7 +42,7 @@ export default {
       this.$store.dispatch('setToken', null)
       this.$store.dispatch('setUser', null)
       this.$router.push({
-        name: 'root'
+        name: 'songs'
       })
     }
   }
